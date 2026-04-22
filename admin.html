@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Premium — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#B8963E;--gl:#D4AF5A;--gll:#F0D080;
+  --dk:#080705;--dk2:#0F0C08;--dk3:#181410;--dk4:#201A10;
+  --cr:#F5EDD8;--mu:#6B5A3E;--mu2:#8A7255;
+  --rd:#E74C3C;--gr:#27AE60;--bl:#2980B9;--yw:#F39C12;--pu:#8E44AD;
+  --side:236px
+}
+html,body{height:100%}
+body{background:var(--dk);color:var(--cr);font-family:'Outfit',sans-serif;overflow-x:hidden}
+::-webkit-scrollbar{width:3px}::-webkit-scrollbar-track{background:var(--dk2)}::-webkit-scrollbar-thumb{background:var(--g);border-radius:2px}
+a{color:inherit;text-decoration:none}
+button{cursor:pointer;font-family:'Outfit',sans-serif}
+input,select,textarea{font-family:'Outfit',sans-serif}
+
+/* ══ LOGIN ══ */
+#loginWrap{position:fixed;inset:0;background:var(--dk);display:flex;align-items:center;justify-content:center;z-index:9999}
+.lb{background:var(--dk3);border:1px solid rgba(184,150,62,.22);width:100%;max-width:400px;animation:lIn .35s ease}
+@keyframes lIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.lb-hd{padding:34px 36px 26px;border-bottom:1px solid rgba(184,150,62,.1);text-align:center;background:linear-gradient(180deg,rgba(184,150,62,.07),transparent)}
+.lb-logo{font-family:'Playfair Display',serif;font-size:34px;font-weight:700;background:linear-gradient(135deg,var(--g),var(--gll));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.lb-sub{font-size:11px;color:var(--mu);letter-spacing:.14em;margin-top:3px}
+.lb-body{padding:28px 36px}
+.lerr{background:rgba(231,76,60,.1);border:1px solid rgba(231,76,60,.3);color:var(--rd);font-size:13px;padding:10px 14px;border-radius:2px;margin-bottom:14px;display:none;text-align:center}
+.lbtn{width:100%;background:linear-gradient(135deg,var(--g),var(--gl));color:var(--dk);border:none;padding:14px;font-size:15px;font-weight:700;border-radius:2px;transition:all .25s;letter-spacing:.04em}
+.lbtn:hover{transform:translateY(-1px);box-shadow:0 8px 24px rgba(184,150,62,.38)}
+.lnote{font-size:12px;color:var(--mu);text-align:center;margin-top:14px}
+
+/* ══ FORM ELEMENTS ══ */
+.fg{margin-bottom:15px}
+.flabel{display:block;font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--mu2);margin-bottom:7px}
+.finput,.fsel,.ftxt{width:100%;background:rgba(245,237,216,.04);border:1px solid rgba(184,150,62,.15);color:var(--cr);padding:11px 14px;font-size:14px;border-radius:2px;outline:none;transition:border-color .2s}
+.finput:focus,.fsel:focus,.ftxt:focus{border-color:var(--g);background:rgba(184,150,62,.04)}
+.finput::placeholder{color:rgba(245,237,216,.2)}
+.fsel option{background:var(--dk3)}
+.ftxt{resize:vertical;min-height:80px;line-height:1.5}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg-full{grid-column:1/-1}
+
+/* ══ APP LAYOUT ══ */
+#appWrap{display:none;min-height:100vh;flex-direction:row}
+
+/* ══ SIDEBAR ══ */
+.sb{width:var(--side);background:var(--dk2);border-right:1px solid rgba(184,150,62,.08);display:flex;flex-direction:column;position:fixed;top:0;bottom:0;left:0;z-index:100;overflow-y:auto}
+.sb-logo{padding:20px 20px 16px;border-bottom:1px solid rgba(184,150,62,.08);flex-shrink:0}
+.sb-logo-t{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;background:linear-gradient(135deg,var(--g),var(--gll));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.sb-logo-s{font-size:10px;color:var(--mu);letter-spacing:.12em;margin-top:2px}
+.sb-nav{flex:1;padding:10px 0}
+.sb-sec{font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--mu);padding:10px 20px 5px}
+.sbi{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:rgba(245,237,216,.42);background:none;border:none;border-left:2px solid transparent;width:100%;text-align:left;transition:all .2s;position:relative}
+.sbi:hover{color:var(--cr);background:rgba(184,150,62,.05)}
+.sbi.on{color:var(--g);background:rgba(184,150,62,.08);border-left-color:var(--g)}
+.sbi-ico{font-size:16px;flex-shrink:0}
+.sbi-badge{margin-left:auto;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;min-width:18px;text-align:center}
+.badge-rd{background:var(--rd);color:#fff}
+.badge-yw{background:var(--yw);color:#fff}
+.badge-gr{background:var(--gr);color:#fff}
+.sb-foot{padding:14px 20px;border-top:1px solid rgba(184,150,62,.08);flex-shrink:0}
+.sb-uname{font-size:13px;color:var(--cr);font-weight:500}
+.sb-urole{font-size:11px;color:var(--mu);margin-top:2px;margin-bottom:10px}
+.sb-logout{display:flex;align-items:center;gap:8px;background:transparent;border:1px solid rgba(231,76,60,.3);color:rgba(231,76,60,.7);padding:8px 14px;border-radius:2px;font-size:13px;width:100%;transition:all .2s}
+.sb-logout:hover{background:rgba(231,76,60,.08);color:var(--rd)}
+
+/* ══ MAIN AREA ══ */
+.main{margin-left:var(--side);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* ══ TOPBAR ══ */
+.topbar{background:var(--dk2);border-bottom:1px solid rgba(184,150,62,.08);padding:0 26px;height:60px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.tb-title{font-family:'Playfair Display',serif;font-size:19px;font-weight:700}
+.tb-right{display:flex;align-items:center;gap:12px}
+.tb-date{font-size:12px;color:var(--mu)}
+.tb-notif-btn{position:relative;width:34px;height:34px;background:rgba(184,150,62,.06);border:1px solid rgba(184,150,62,.15);border-radius:2px;display:flex;align-items:center;justify-content:center;font-size:17px;cursor:pointer;transition:all .2s}
+.tb-notif-btn:hover{background:rgba(184,150,62,.12)}
+.ndot{position:absolute;top:7px;right:7px;width:7px;height:7px;background:var(--rd);border-radius:50%;display:none}
+.tb-user{display:flex;align-items:center;gap:9px;background:rgba(184,150,62,.06);border:1px solid rgba(184,150,62,.15);padding:7px 13px;border-radius:2px;font-size:13px}
+.tb-ava{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--g),var(--gll));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--dk)}
+.tb-site-link{background:rgba(184,150,62,.06);border:1px solid rgba(184,150,62,.15);color:var(--g);padding:7px 13px;border-radius:2px;font-size:12px;font-weight:500;transition:all .2s}
+.tb-site-link:hover{background:rgba(184,150,62,.12)}
+
+/* ══ NOTIFICATION PANEL ══ */
+.notif-panel{position:fixed;top:60px;right:0;width:310px;background:var(--dk3);border-left:1px solid rgba(184,150,62,.1);border-bottom:1px solid rgba(184,150,62,.1);z-index:200;display:none;max-height:80vh;overflow-y:auto;box-shadow:-10px 10px 40px rgba(0,0,0,.4)}
+.notif-panel.on{display:block}
+.np-hd{padding:13px 17px;border-bottom:1px solid rgba(184,150,62,.08);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--dk3)}
+.np-hd h4{font-size:14px;font-weight:600}
+.np-clear{background:none;border:none;color:var(--mu);font-size:12px;cursor:pointer;transition:color .2s}
+.np-clear:hover{color:var(--g)}
+.notif-item{padding:12px 17px;border-bottom:1px solid rgba(184,150,62,.05);font-size:13px;transition:background .2s}
+.notif-item:hover{background:rgba(184,150,62,.04)}
+.notif-item.unread{border-left:2px solid var(--g)}
+.notif-msg{line-height:1.5;color:rgba(245,237,216,.75);margin-bottom:3px}
+.notif-time{font-size:11px;color:var(--mu)}
+
+/* ══ PAGES ══ */
+.page{display:none;padding:26px}
+.page.on{display:block}
+
+/* ══ STAT CARDS ══ */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;margin-bottom:22px}
+.sc{background:var(--dk3);border:1px solid rgba(184,150,62,.07);padding:20px 20px 16px;position:relative;overflow:hidden;transition:all .3s}
+.sc:hover{border-color:rgba(184,150,62,.2);transform:translateY(-2px)}
+.sc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--g),var(--gll));transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.sc:hover::before{transform:scaleX(1)}
+.sc-ico{font-size:24px;margin-bottom:10px}
+.sc-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--g);line-height:1}
+.sc-lbl{font-size:12px;color:var(--mu);margin-top:4px}
+.sc-chg{font-size:12px;margin-top:5px}
+.up{color:var(--gr)}.dn{color:var(--rd)}.neu{color:var(--mu)}
+
+/* ══ TABLE ══ */
+.tbl-wrap{background:var(--dk3);border:1px solid rgba(184,150,62,.07);overflow:hidden}
+.tbl-top{padding:13px 17px;border-bottom:1px solid rgba(184,150,62,.07);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.tsearch{flex:1;min-width:180px;background:rgba(245,237,216,.04);border:1px solid rgba(184,150,62,.15);color:var(--cr);padding:8px 12px;font-size:13px;border-radius:2px;outline:none;transition:border-color .2s}
+.tsearch:focus{border-color:var(--g)}
+.tsearch::placeholder{color:rgba(245,237,216,.2)}
+.tsel{background:rgba(245,237,216,.04);border:1px solid rgba(184,150,62,.15);color:var(--cr);padding:8px 11px;font-size:12px;border-radius:2px;outline:none;cursor:pointer}
+.tsel option{background:var(--dk3)}
+table{width:100%;border-collapse:collapse}
+th{background:rgba(184,150,62,.06);color:var(--mu2);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;padding:11px 13px;text-align:left;border-bottom:1px solid rgba(184,150,62,.08)}
+td{padding:12px 13px;font-size:13px;border-bottom:1px solid rgba(184,150,62,.05);vertical-align:middle}
+tr:hover td{background:rgba(184,150,62,.03)}
+tr:last-child td{border-bottom:none}
+.tbl-footer{padding:11px 17px;border-top:1px solid rgba(184,150,62,.07);font-size:13px;color:var(--mu)}
+
+/* ══ STATUS BADGES ══ */
+.badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;display:inline-block}
+.b-pending{background:rgba(243,156,18,.12);color:#F39C12;border:1px solid rgba(243,156,18,.25)}
+.b-approved{background:rgba(39,174,96,.12);color:#27AE60;border:1px solid rgba(39,174,96,.25)}
+.b-delivered{background:rgba(41,128,185,.12);color:#3498DB;border:1px solid rgba(41,128,185,.25)}
+.b-rejected{background:rgba(231,76,60,.12);color:#E74C3C;border:1px solid rgba(231,76,60,.25)}
+.b-active{background:rgba(39,174,96,.12);color:#27AE60;border:1px solid rgba(39,174,96,.25)}
+.b-draft{background:rgba(243,156,18,.12);color:#F39C12;border:1px solid rgba(243,156,18,.25)}
+.b-hidden{background:rgba(100,100,100,.15);color:#888;border:1px solid rgba(100,100,100,.3)}
+.b-banned{background:rgba(231,76,60,.12);color:#E74C3C;border:1px solid rgba(231,76,60,.25)}
+.b-user{background:rgba(41,128,185,.12);color:#3498DB;border:1px solid rgba(41,128,185,.25)}
+
+/* ══ ACTION BUTTONS ══ */
+.abtns{display:flex;gap:5px;flex-wrap:wrap}
+.abtn{padding:5px 10px;font-size:11px;font-weight:600;border-radius:2px;transition:all .2s;border:1px solid}
+.abtn-g{background:rgba(39,174,96,.1);border-color:rgba(39,174,96,.3);color:#27AE60}.abtn-g:hover{background:rgba(39,174,96,.22)}
+.abtn-r{background:rgba(231,76,60,.1);border-color:rgba(231,76,60,.3);color:#E74C3C}.abtn-r:hover{background:rgba(231,76,60,.22)}
+.abtn-b{background:rgba(41,128,185,.1);border-color:rgba(41,128,185,.3);color:#3498DB}.abtn-b:hover{background:rgba(41,128,185,.22)}
+.abtn-y{background:rgba(243,156,18,.1);border-color:rgba(243,156,18,.3);color:#F39C12}.abtn-y:hover{background:rgba(243,156,18,.22)}
+.abtn-pu{background:rgba(142,68,173,.1);border-color:rgba(142,68,173,.3);color:#9B59B6}.abtn-pu:hover{background:rgba(142,68,173,.22)}
+.abtn-mu{background:rgba(100,100,100,.1);border-color:rgba(100,100,100,.3);color:#888}.abtn-mu:hover{background:rgba(100,100,100,.2)}
+
+/* ══ SECTION HEADER ══ */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px}
+.sh h3{font-family:'Playfair Display',serif;font-size:20px;font-weight:700}
+.sh-tag{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--g)}
+.fbtn{padding:10px 20px;font-size:13px;font-weight:600;border-radius:2px;transition:all .25s}
+.fbtn-g{background:linear-gradient(135deg,var(--g),var(--gl));color:var(--dk);border:none}.fbtn-g:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(184,150,62,.35)}
+.fbtn-o{background:transparent;color:var(--mu);border:1px solid rgba(184,150,62,.2)}.fbtn-o:hover{border-color:var(--g);color:var(--cr)}
+.fbtn-r{background:transparent;color:rgba(231,76,60,.7);border:1px solid rgba(231,76,60,.25)}.fbtn-r:hover{background:rgba(231,76,60,.08);color:var(--rd)}
+
+/* ══ FORM BLOCK ══ */
+.form-block{background:var(--dk3);border:1px solid rgba(184,150,62,.08);padding:24px;max-width:700px}
+.form-block h4{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:6px}
+.form-block .sub{font-size:13px;color:var(--mu);margin-bottom:18px;line-height:1.6}
+.form-actions{display:flex;gap:9px;margin-top:18px}
+
+/* ══ PRODUCT CARDS ══ */
+.prod-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+.pac{background:var(--dk4);border:1px solid rgba(184,150,62,.07);padding:17px;position:relative;transition:all .3s}
+.pac:hover{border-color:rgba(184,150,62,.2)}
+.pac.inactive{opacity:.45}
+.pac-ico{font-size:32px;margin-bottom:9px}
+.pac-cat{font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--g);margin-bottom:5px}
+.pac-name{font-family:'Playfair Display',serif;font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.3}
+.pac-price{font-family:'Playfair Display',serif;font-size:20px;color:var(--g);line-height:1}
+.pac-old{font-size:12px;color:var(--mu);text-decoration:line-through;margin-left:6px;font-family:'Outfit',sans-serif}
+.pac-actions{display:flex;gap:5px;margin-top:12px;flex-wrap:wrap}
+.pac-top-badge{position:absolute;top:10px;right:10px;font-size:10px;font-weight:600;padding:3px 8px;border-radius:1px}
+.pac-top-badge.hot{background:#C0392B;color:#fff}
+.pac-top-badge.new{background:#27AE60;color:#fff}
+.pac-top-badge.sale{background:var(--g);color:var(--dk)}
+
+/* ══ CHART ══ */
+.chart-box{background:var(--dk3);border:1px solid rgba(184,150,62,.07);padding:20px;margin-bottom:20px}
+.chart-title{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:16px}
+.bar-chart{display:flex;align-items:flex-end;gap:6px;height:90px}
+.bar{flex:1;border-radius:2px 2px 0 0;position:relative;transition:all .3s;min-width:0;cursor:pointer}
+.bar:hover{filter:brightness(1.3)}
+.bar-lbl{position:absolute;bottom:-18px;left:0;right:0;text-align:center;font-size:9px;color:var(--mu);white-space:nowrap}
+.bar-val{position:absolute;top:-18px;left:0;right:0;text-align:center;font-size:9px;color:var(--gll);display:none;white-space:nowrap}
+.bar:hover .bar-val{display:block}
+.chart-x-axis{margin-top:26px;display:flex;justify-content:space-between;font-size:10px;color:var(--mu)}
+.cat-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.cat-bar-lbl{font-size:12px;color:var(--mu);width:66px;text-align:right;flex-shrink:0}
+.cat-bar-track{flex:1;background:rgba(184,150,62,.08);border-radius:2px;height:18px;overflow:hidden}
+.cat-bar-fill{height:100%;background:linear-gradient(90deg,var(--g),var(--gll));transition:width .5s}
+.cat-bar-val{font-size:12px;color:var(--g);font-weight:600;width:28px;text-align:right}
+
+/* ══ SETTINGS ══ */
+.settings-g{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.set-block{background:var(--dk3);border:1px solid rgba(184,150,62,.08);padding:22px}
+.set-block h4{font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:5px}
+.set-block .sub{font-size:13px;color:var(--mu);margin-bottom:16px;line-height:1.6}
+.set-block.full{grid-column:1/-1}
+
+/* ══ TOGGLE ══ */
+.toggle-wrap{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(184,150,62,.05)}
+.toggle-wrap:last-child{border-bottom:none}
+.toggle-info .tl{font-size:14px;color:var(--cr)}
+.toggle-info .ts{font-size:12px;color:var(--mu);margin-top:2px}
+.toggle{width:42px;height:24px;border-radius:100px;background:rgba(100,100,100,.3);position:relative;cursor:pointer;transition:background .3s;border:none;flex-shrink:0}
+.toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--mu);transition:all .3s}
+.toggle.on{background:var(--g)}.toggle.on::after{left:21px;background:var(--dk)}
+
+/* ══ COUPON CARDS ══ */
+.cp-card{background:var(--dk4);border:1px solid rgba(184,150,62,.07);padding:15px 17px;display:flex;align-items:center;justify-content:space-between;gap:10px;transition:all .3s;flex-wrap:wrap}
+.cp-card:hover{border-color:rgba(184,150,62,.2)}
+.cp-code{font-family:'Playfair Display',serif;font-size:19px;font-weight:700;color:var(--g);letter-spacing:.05em}
+.cp-meta{font-size:12px;color:var(--mu);margin-top:3px}
+.cp-disc{font-size:13px;font-weight:600;color:var(--cr)}
+
+/* ══ LOG ITEMS ══ */
+.log-item{padding:10px 15px;border-bottom:1px solid rgba(184,150,62,.05);display:flex;gap:11px;align-items:flex-start}
+.log-type{font-size:10px;font-weight:600;padding:3px 8px;border-radius:100px;flex-shrink:0;letter-spacing:.06em;text-transform:uppercase}
+.lt-order{background:rgba(41,128,185,.12);color:#3498DB}
+.lt-admin{background:rgba(142,68,173,.12);color:#9B59B6}
+.lt-user{background:rgba(39,174,96,.12);color:#27AE60}
+.lt-payment{background:rgba(243,156,18,.12);color:#F39C12}
+.lt-product{background:rgba(184,150,62,.12);color:var(--g)}
+.lt-coupon{background:rgba(231,76,60,.12);color:#E74C3C}
+.log-msg{flex:1;line-height:1.5;color:rgba(245,237,216,.7);font-size:13px}
+.log-time{font-size:11px;color:var(--mu);flex-shrink:0}
+
+/* ══ MODAL ══ */
+.overlay{position:fixed;inset:0;background:rgba(8,7,5,.92);backdrop-filter:blur(8px);z-index:2000;display:none;align-items:center;justify-content:center;padding:18px}
+.overlay.on{display:flex}
+.modal{background:var(--dk3);border:1px solid rgba(184,150,62,.2);width:100%;max-width:520px;max-height:90vh;overflow-y:auto;animation:mIn .3s ease}
+.modal.lg{max-width:680px}
+@keyframes mIn{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:scale(1)}}
+.mhd{padding:19px 24px;border-bottom:1px solid rgba(184,150,62,.1);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--dk3);z-index:10}
+.mhd h3{font-family:'Playfair Display',serif;font-size:19px;font-weight:700}
+.mx{background:none;border:none;color:var(--mu);font-size:26px;line-height:1;transition:color .2s}
+.mx:hover{color:var(--cr)}
+.mbd{padding:22px 24px}
+.detail-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(184,150,62,.06);font-size:13px}
+.detail-row:last-child{border-bottom:none}
+.dl{color:var(--mu)}
+.dv{font-weight:500;text-align:right;max-width:260px;word-break:break-all}
+
+/* ══ ANALYTICS ══ */
+.an-row{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:20px}
+.an-c{background:var(--dk3);border:1px solid rgba(184,150,62,.07);padding:18px 18px 14px}
+.an-val{font-family:'Playfair Display',serif;font-size:26px;font-weight:700;color:var(--g);line-height:1}
+.an-lbl{font-size:12px;color:var(--mu);margin-top:5px}
+.an-chg{font-size:12px;margin-top:5px}
+
+/* ══ EMPTY ══ */
+.empty{text-align:center;padding:50px 20px;color:var(--mu)}
+.empty-i{font-size:42px;margin-bottom:12px}
+.empty p{font-size:15px}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:22px;right:22px;z-index:9000;background:var(--dk4);border:1px solid rgba(184,150,62,.25);padding:13px 18px;display:flex;align-items:flex-start;gap:10px;max-width:310px;border-radius:3px;transform:translateX(130%);transition:transform .4s cubic-bezier(.34,1.56,.64,1)}
+.toast.show{transform:translateX(0)}
+.t-ico{font-size:18px;flex-shrink:0}
+.t-msg{font-size:14px;line-height:1.5;color:rgba(245,237,216,.8)}
+
+/* ══ SYS INFO ══ */
+.sys-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:2px;margin-top:14px}
+.sys-c{background:var(--dk4);border:1px solid rgba(184,150,62,.07);padding:14px;text-align:center}
+.sys-val{font-family:'Playfair Display',serif;font-size:22px;color:var(--g)}
+.sys-lbl{font-size:11px;color:var(--mu);margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOGIN ══════════ -->
+<div id="loginWrap">
+  <div class="lb">
+    <div class="lb-hd">
+      <div class="lb-logo">Premium</div>
+      <div class="lb-sub">ADMIN CONTROL PANEL</div>
+    </div>
+    <div class="lb-body">
+      <div class="lerr" id="lErr"></div>
+      <div class="fg">
+        <label class="flabel">অ্যাডমিন ইমেইল</label>
+        <input type="email" class="finput" id="lEmail" placeholder="admin@premium.com" onkeypress="if(event.key==='Enter')doLogin()">
+      </div>
+      <div class="fg">
+        <label class="flabel">পাসওয়ার্ড</label>
+        <input type="password" class="finput" id="lPass" placeholder="••••••••" onkeypress="if(event.key==='Enter')doLogin()">
+      </div>
+      <button class="lbtn" onclick="doLogin()">লগইন করুন →</button>
+      <p class="lnote">Default: admin@premium.com / admin123</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP ══════════ -->
+<div id="appWrap">
+
+  <!-- SIDEBAR -->
+  <div class="sb">
+    <div class="sb-logo">
+      <div class="sb-logo-t">Premium</div>
+      <div class="sb-logo-s">Admin Panel</div>
+    </div>
+    <nav class="sb-nav">
+      <div class="sb-sec">মূল মেনু</div>
+      <button class="sbi on" onclick="showPage('dashboard',this)"><span class="sbi-ico">📊</span>ড্যাশবোর্ড</button>
+      <button class="sbi" id="sbOrders" onclick="showPage('orders',this)"><span class="sbi-ico">📦</span>অর্ডার<span class="sbi-badge badge-rd" id="pBadge" style="display:none">0</span></button>
+      <button class="sbi" id="sbPay" onclick="showPage('payments',this)"><span class="sbi-ico">💳</span>পেমেন্ট যাচাই<span class="sbi-badge badge-yw" id="ppBadge" style="display:none">0</span></button>
+
+      <div class="sb-sec">প্রোডাক্ট</div>
+      <button class="sbi" onclick="showPage('products',this)"><span class="sbi-ico">🛍️</span>প্রোডাক্ট সমূহ</button>
+      <button class="sbi" onclick="showPage('addprod',this);clearProdForm()"><span class="sbi-ico">➕</span>নতুন প্রোডাক্ট</button>
+
+      <div class="sb-sec">ব্যবস্থাপনা</div>
+      <button class="sbi" onclick="showPage('users',this)"><span class="sbi-ico">👤</span>ব্যবহারকারী</button>
+      <button class="sbi" onclick="showPage('coupons',this)"><span class="sbi-ico">🎟️</span>কুপন / ডিসকাউন্ট</button>
+      <button class="sbi" onclick="showPage('analytics',this)"><span class="sbi-ico">📈</span>অ্যানালিটিক্স</button>
+
+      <div class="sb-sec">সিস্টেম</div>
+      <button class="sbi" onclick="showPage('settings',this)"><span class="sbi-ico">⚙️</span>সেটিংস</button>
+      <button class="sbi" onclick="showPage('logs',this)"><span class="sbi-ico">📋</span>লগ ও অ্যাক্টিভিটি</button>
+      <button class="sbi" onclick="window.open('index.html','_blank')"><span class="sbi-ico">🌐</span>সাইট দেখুন ↗</button>
+    </nav>
+    <div class="sb-foot">
+      <div class="sb-uname" id="sbName">Admin</div>
+      <div class="sb-urole">Super Admin · সক্রিয়</div>
+      <button class="sb-logout" onclick="doLogout()">🔓 লগআউট</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="tb-title" id="tbTitle">ড্যাশবোর্ড</div>
+      <div class="tb-right">
+        <div class="tb-date" id="tbDate"></div>
+        <button class="tb-notif-btn" onclick="toggleNotif()" title="নোটিফিকেশন">🔔<span class="ndot" id="ndot"></span></button>
+        <a href="index.html" class="tb-site-link">🌐 সাইট</a>
+        <div class="tb-user">
+          <div class="tb-ava" id="tbAva">A</div>
+          <span id="tbName">Admin</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION PANEL -->
+    <div class="notif-panel" id="notifPanel">
+      <div class="np-hd">
+        <h4>🔔 নোটিফিকেশন</h4>
+        <button class="np-clear" onclick="clearNotifs()">সব পড়া হয়েছে</button>
+      </div>
+      <div id="notifList"></div>
+    </div>
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page on" id="pg-dashboard">
+      <div class="stat-row" id="statRow"></div>
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:2px;margin-bottom:20px">
+        <div class="chart-box">
+          <div class="chart-title">৭ দিনের বিক্রয় (৳)</div>
+          <div class="bar-chart" id="salesChart"></div>
+          <div class="chart-x-axis" id="chartX"></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">ক্যাটাগরি বিক্রয়</div>
+          <div id="catChart" style="margin-top:8px"></div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:20px">
+        <div class="tbl-wrap">
+          <div style="padding:12px 16px;border-bottom:1px solid rgba(184,150,62,.07);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:14px;font-weight:600">সাম্প্রতিক অর্ডার</span>
+            <button class="abtn abtn-b" onclick="showPage('orders',document.getElementById('sbOrders'))">সব দেখুন →</button>
+          </div>
+          <table><thead><tr><th>গ্রাহক</th><th>প্রোডাক্ট</th><th>পরিমাণ</th><th>স্ট্যাটাস</th></tr></thead>
+          <tbody id="recentOrd"></tbody></table>
+        </div>
+        <div class="tbl-wrap">
+          <div style="padding:12px 16px;border-bottom:1px solid rgba(184,150,62,.07)">
+            <span style="font-size:14px;font-weight:600">সেরা বিক্রীত প্রোডাক্ট</span>
+          </div>
+          <div id="topProdList" style="padding:8px 0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS ── -->
+    <div class="page" id="pg-orders">
+      <div class="sh">
+        <h3>অর্ডার ব্যবস্থাপনা</h3>
+        <div style="display:flex;gap:8px">
+          <button class="fbtn fbtn-o" onclick="exportCSV('orders')" style="font-size:12px;padding:8px 13px">📥 CSV</button>
+        </div>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <input class="tsearch" id="ordQ" placeholder="🔍 নাম, ইমেইল, TRX ID..." oninput="renderOrders()">
+          <select class="tsel" id="ordS" onchange="renderOrders()">
+            <option value="all">সব স্ট্যাটাস</option>
+            <option value="pending">পেন্ডিং</option>
+            <option value="approved">অনুমোদিত</option>
+            <option value="delivered">ডেলিভারড</option>
+            <option value="rejected">প্রত্যাখ্যাত</option>
+          </select>
+          <select class="tsel" id="ordP" onchange="renderOrders()">
+            <option value="all">সব পেমেন্ট</option>
+            <option value="bkash">বিকাশ</option>
+            <option value="nagad">নগদ</option>
+          </select>
+          <select class="tsel" id="ordD" onchange="renderOrders()">
+            <option value="all">সব সময়</option>
+            <option value="today">আজকের</option>
+            <option value="week">এই সপ্তাহ</option>
+            <option value="month">এই মাস</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>ID</th><th>তারিখ</th><th>গ্রাহক</th><th>প্রোডাক্ট</th><th>পেমেন্ট</th><th>TRX ID</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>একশন</th></tr></thead>
+            <tbody id="ordBody"></tbody>
+          </table>
+        </div>
+        <div class="tbl-footer" id="ordCount">মোট: ০টি</div>
+      </div>
+    </div>
+
+    <!-- ── PAYMENTS ── -->
+    <div class="page" id="pg-payments">
+      <div class="sh">
+        <h3>পেমেন্ট যাচাই</h3>
+        <span class="sh-tag" id="payPendingCount">পেন্ডিং: ০টি</span>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <input class="tsearch" id="payQ" placeholder="🔍 TRX ID, নাম..." oninput="renderPayments()">
+          <select class="tsel" id="payS" onchange="renderPayments()">
+            <option value="pending">শুধু পেন্ডিং</option>
+            <option value="all">সব</option>
+            <option value="approved">অনুমোদিত</option>
+            <option value="rejected">প্রত্যাখ্যাত</option>
+          </select>
+          <select class="tsel" id="payM" onchange="renderPayments()">
+            <option value="all">সব পদ্ধতি</option>
+            <option value="bkash">বিকাশ</option>
+            <option value="nagad">নগদ</option>
+          </select>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>তারিখ</th><th>গ্রাহক</th><th>প্রোডাক্ট</th><th>পদ্ধতি</th><th>TRX ID</th><th>পরিমাণ</th><th>স্ট্যাটাস</th><th>একশন</th></tr></thead>
+            <tbody id="payBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PRODUCTS ── -->
+    <div class="page" id="pg-products">
+      <div class="sh">
+        <h3>প্রোডাক্ট সমূহ</h3>
+        <button class="fbtn fbtn-g" onclick="showPage('addprod',null);clearProdForm()">+ নতুন প্রোডাক্ট</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <input class="tsearch" id="prodQ" placeholder="🔍 প্রোডাক্ট খুঁজুন..." oninput="renderProdsAdmin()" style="max-width:280px">
+        <select class="tsel" id="prodCatF" onchange="renderProdsAdmin()">
+          <option value="all">সব ক্যাটাগরি</option>
+          <option value="course">কোর্স</option>
+          <option value="software">সফটওয়্যার</option>
+          <option value="script">স্ক্রিপ্ট</option>
+          <option value="ebook">ই-বুক</option>
+        </select>
+        <select class="tsel" id="prodStatF" onchange="renderProdsAdmin()">
+          <option value="all">সব স্ট্যাটাস</option>
+          <option value="active">Active</option>
+          <option value="draft">Draft</option>
+          <option value="hidden">Hidden</option>
+        </select>
+      </div>
+      <div class="prod-grid" id="prodGrid"></div>
+    </div>
+
+    <!-- ── ADD/EDIT PRODUCT ── -->
+    <div class="page" id="pg-addprod">
+      <div class="sh"><h3 id="apTitle">নতুন প্রোডাক্ট যোগ করুন</h3></div>
+      <div class="form-block">
+        <input type="hidden" id="editId">
+        <div class="fgrid">
+          <div class="fg fg-full">
+            <label class="flabel">প্রোডাক্টের নাম *</label>
+            <input type="text" class="finput" id="pName" placeholder="প্রোডাক্টের নাম দিন">
+          </div>
+          <div class="fg">
+            <label class="flabel">ক্যাটাগরি *</label>
+            <select class="fsel" id="pCat">
+              <option value="">বেছে নিন</option>
+              <option value="course">অনলাইন কোর্স</option>
+              <option value="software">সফটওয়্যার</option>
+              <option value="script">ওয়েবসাইট স্ক্রিপ্ট</option>
+              <option value="ebook">ই-বুক</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flabel">স্ট্যাটাস</label>
+            <select class="fsel" id="pStatus">
+              <option value="active">Active (প্রকাশিত)</option>
+              <option value="draft">Draft (খসড়া)</option>
+              <option value="hidden">Hidden (লুকানো)</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flabel">আইকন ইমোজি</label>
+            <input type="text" class="finput" id="pIco" placeholder="🎓" maxlength="4">
+          </div>
+          <div class="fg">
+            <label class="flabel">ব্যাজ</label>
+            <select class="fsel" id="pBadge">
+              <option value="">কোনো ব্যাজ নেই</option>
+              <option value="hot">🔥 জনপ্রিয়</option>
+              <option value="new">✨ নতুন</option>
+              <option value="sale">💰 অফার</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flabel">বিক্রয় মূল্য (৳) *</label>
+            <input type="number" class="finput" id="pPrice" placeholder="1200">
+          </div>
+          <div class="fg">
+            <label class="flabel">আগের মূল্য (৳)</label>
+            <input type="number" class="finput" id="pOld" placeholder="2500">
+          </div>
+          <div class="fg fg-full">
+            <label class="flabel">ডাউনলোড লিংক *</label>
+            <input type="text" class="finput" id="pFile" placeholder="https://drive.google.com/... বা যেকোনো লিংক">
+          </div>
+          <div class="fg fg-full">
+            <label class="flabel">বিবরণ *</label>
+            <textarea class="ftxt" id="pDesc" placeholder="প্রোডাক্টের বিস্তারিত বিবরণ লিখুন..."></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="fbtn fbtn-g" onclick="saveProd()">💾 সেভ করুন</button>
+          <button class="fbtn fbtn-o" onclick="clearProdForm()">✕ পরিষ্কার</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── USERS ── -->
+    <div class="page" id="pg-users">
+      <div class="sh">
+        <h3>ব্যবহারকারী ব্যবস্থাপনা</h3>
+        <span class="sh-tag" id="userCount">মোট: ০ জন</span>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <input class="tsearch" id="userQ" placeholder="🔍 নাম বা ইমেইল..." oninput="renderUsers()">
+          <select class="tsel" id="userF" onchange="renderUsers()">
+            <option value="all">সব ইউজার</option>
+            <option value="active">সক্রিয়</option>
+            <option value="banned">নিষিদ্ধ</option>
+          </select>
+          <button class="fbtn fbtn-o" onclick="exportCSV('users')" style="font-size:12px;padding:8px 12px">📥 CSV</button>
+        </div>
+        <div style="overflow-x:auto">
+          <table>
+            <thead><tr><th>নাম</th><th>ইমেইল</th><th>নিবন্ধন</th><th>মোট অর্ডার</th><th>মোট ব্যয়</th><th>স্ট্যাটাস</th><th>একশন</th></tr></thead>
+            <tbody id="userBody"></tbody>
+          </table>
+        </div>
+        <div class="tbl-footer" id="userCountFt">মোট: ০ জন</div>
+      </div>
+    </div>
+
+    <!-- ── COUPONS ── -->
+    <div class="page" id="pg-coupons">
+      <div class="sh"><h3>কুপন ও ডিসকাউন্ট</h3></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start">
+        <div class="form-block">
+          <h4>নতুন কুপন তৈরি</h4>
+          <div class="sub">কুপন কোড তৈরি করুন এবং গ্রাহকদের দিন।</div>
+          <input type="hidden" id="cpId">
+          <div class="fg">
+            <label class="flabel">কুপন কোড *</label>
+            <input type="text" class="finput" id="cpCode" placeholder="SAVE20" style="text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div class="fg">
+            <label class="flabel">ডিসকাউন্ট ধরন *</label>
+            <select class="fsel" id="cpType">
+              <option value="percent">শতাংশ (%)</option>
+              <option value="fixed">নির্দিষ্ট পরিমাণ (৳)</option>
+            </select>
+          </div>
+          <div class="fg">
+            <label class="flabel">ডিসকাউন্ট মান *</label>
+            <input type="number" class="finput" id="cpVal" placeholder="20">
+          </div>
+          <div class="fg">
+            <label class="flabel">মেয়াদ শেষ তারিখ</label>
+            <input type="date" class="finput" id="cpExpiry">
+          </div>
+          <div class="fg">
+            <label class="flabel">ব্যবহারের সীমা (0 = সীমাহীন)</label>
+            <input type="number" class="finput" id="cpLimit" value="0">
+          </div>
+          <div class="form-actions">
+            <button class="fbtn fbtn-g" onclick="saveCoupon()">💾 কুপন সেভ করুন</button>
+            <button class="fbtn fbtn-o" onclick="clearCpForm()">✕</button>
+          </div>
+        </div>
+        <div>
+          <h4 style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;margin-bottom:14px">কুপন তালিকা</h4>
+          <div id="cpList" style="display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ANALYTICS ── -->
+    <div class="page" id="pg-analytics">
+      <div class="sh"><h3>অ্যানালিটিক্স ও রিপোর্ট</h3></div>
+      <div class="an-row" id="anRow"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:20px">
+        <div class="chart-box">
+          <div class="chart-title">৩০ দিনের বিক্রয় ট্রেন্ড</div>
+          <div class="bar-chart" id="an30Chart"></div>
+          <div class="chart-x-axis" id="an30X"></div>
+        </div>
+        <div class="chart-box">
+          <div class="chart-title">পেমেন্ট পদ্ধতি বিভাজন</div>
+          <div id="payMethodChart" style="margin-top:12px"></div>
+        </div>
+      </div>
+      <div class="chart-box">
+        <div class="chart-title">প্রোডাক্ট পারফরম্যান্স (সেরা ১০)</div>
+        <div id="topProdChart" style="margin-top:8px"></div>
+      </div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div class="page" id="pg-settings">
+      <div class="sh"><h3>সাইট সেটিংস</h3></div>
+      <div class="settings-g">
+        <!-- Payment Numbers -->
+        <div class="set-block full">
+          <h4>💳 পেমেন্ট সেটিং</h4>
+          <div class="sub">হোম পেজ ও অর্ডার ফর্মে এই নম্বর দেখানো হবে।</div>
+          <div class="fgrid">
+            <div class="fg"><label class="flabel">বিকাশ নম্বর</label><input type="text" class="finput" id="sBkash" placeholder="01700000000"></div>
+            <div class="fg"><label class="flabel">নগদ নম্বর</label><input type="text" class="finput" id="sNagad" placeholder="01800000000"></div>
+            <div class="fg"><label class="flabel">WhatsApp নম্বর</label><input type="text" class="finput" id="sWa" placeholder="01700000000"></div>
+            <div class="fg"><label class="flabel">যোগাযোগ ইমেইল</label><input type="email" class="finput" id="sEmail" placeholder="info@premium.com.bd"></div>
+          </div>
+          <div class="form-actions"><button class="fbtn fbtn-g" onclick="saveCfg('payment')">💾 সেভ করুন</button></div>
+        </div>
+
+        <!-- Admin Credentials -->
+        <div class="set-block">
+          <h4>🔐 অ্যাডমিন ক্রেডেনশিয়াল</h4>
+          <div class="sub">অ্যাডমিন ইমেইল ও পাসওয়ার্ড পরিবর্তন করুন।</div>
+          <div class="fg"><label class="flabel">অ্যাডমিন ইমেইল</label><input type="email" class="finput" id="sAdminEmail" placeholder="admin@premium.com"></div>
+          <div class="fg"><label class="flabel">নতুন পাসওয়ার্ড</label><input type="password" class="finput" id="sNewPass" placeholder="নতুন পাসওয়ার্ড"></div>
+          <div class="fg"><label class="flabel">পাসওয়ার্ড নিশ্চিত</label><input type="password" class="finput" id="sConfPass" placeholder="আবার টাইপ করুন"></div>
+          <div class="form-actions"><button class="fbtn fbtn-g" onclick="changePass()">🔒 পরিবর্তন করুন</button></div>
+        </div>
+
+        <!-- Site Info -->
+        <div class="set-block">
+          <h4>🎨 সাইট তথ্য</h4>
+          <div class="sub">সাইটের নাম ও সাধারণ তথ্য পরিবর্তন করুন।</div>
+          <div class="fg"><label class="flabel">সাইটের নাম</label><input type="text" class="finput" id="sSiteName" placeholder="Premium"></div>
+          <div class="form-actions"><button class="fbtn fbtn-g" onclick="saveCfg('site')">💾 সেভ করুন</button></div>
+        </div>
+
+        <!-- Data Management -->
+        <div class="set-block">
+          <h4>🗄️ ডেটা ব্যবস্থাপনা</h4>
+          <div class="sub">অর্ডার ও ডেটা এক্সপোর্ট বা মুছুন।</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="fbtn fbtn-o" onclick="exportCSV('orders')" style="width:100%;font-size:13px">📥 অর্ডার CSV Export</button>
+            <button class="fbtn fbtn-o" onclick="exportCSV('users')" style="width:100%;font-size:13px">📥 ইউজার CSV Export</button>
+            <button class="fbtn fbtn-o" onclick="clearDelivered()" style="width:100%;font-size:13px;color:var(--yw)">🧹 ডেলিভারড অর্ডার মুছুন</button>
+            <button class="fbtn fbtn-r" onclick="nukeOrders()" style="width:100%;font-size:13px">⚠️ সব অর্ডার মুছুন</button>
+          </div>
+        </div>
+
+        <!-- System Info -->
+        <div class="set-block full">
+          <h4>📊 সিস্টেম সারসংক্ষেপ</h4>
+          <div class="sys-grid" id="sysGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── LOGS ── -->
+    <div class="page" id="pg-logs">
+      <div class="sh">
+        <h3>লগ ও অ্যাক্টিভিটি</h3>
+        <button class="fbtn fbtn-r" onclick="nukeLogs()" style="font-size:12px;padding:8px 13px">🗑 লগ মুছুন</button>
+      </div>
+      <div class="tbl-wrap">
+        <div class="tbl-top">
+          <input class="tsearch" id="logQ" placeholder="🔍 লগ খুঁজুন..." oninput="renderLogs()">
+          <select class="tsel" id="logT" onchange="renderLogs()">
+            <option value="all">সব ধরন</option>
+            <option value="order_placed">অর্ডার</option>
+            <option value="admin_login">অ্যাডমিন লগইন</option>
+            <option value="user_login">ইউজার লগইন</option>
+            <option value="user_register">নিবন্ধন</option>
+            <option value="payment">পেমেন্ট</option>
+            <option value="product">প্রোডাক্ট</option>
+            <option value="coupon">কুপন</option>
+          </select>
+        </div>
+        <div id="logList"></div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /appWrap -->
+
+<!-- ORDER DETAIL MODAL -->
+<div class="overlay" id="ordModal">
+  <div class="modal">
+    <div class="mhd"><h3>অর্ডার বিবরণ</h3><button class="mx" onclick="closeModal('ordModal')">×</button></div>
+    <div class="mbd" id="ordModalBd"></div>
+  </div>
+</div>
+
+<!-- USER DETAIL MODAL -->
+<div class="overlay" id="userModal">
+  <div class="modal lg">
+    <div class="mhd"><h3>ইউজার বিবরণ</h3><button class="mx" onclick="closeModal('userModal')">×</button></div>
+    <div class="mbd" id="userModalBd"></div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="t-ico" id="tIco">✅</span>
+  <span class="t-msg" id="tMsg">সফল!</span>
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════
+//  DATABASE
+// ════════════════════════════════════════════════════════
+const DB = {
+  g(k) { try { return JSON.parse(localStorage.getItem(k)) } catch { return null } },
+  s(k, v) { localStorage.setItem(k, JSON.stringify(v)) },
+  orders() { return this.g('premiumOrders') || [] },
+  saveOrders(o) { this.s('premiumOrders', o) },
+  products() {
+    return this.g('premiumProducts') || [
+      { id: 1, cat: 'course', ico: '🎓', badge: 'hot', bt: 'জনপ্রিয়', name: 'ডিজিটাল মার্কেটিং মাস্টারক্লাস', desc: 'SEO, Facebook Ads, Content Marketing।', price: 1200, old: 2500, file: '#', status: 'active', ts: Date.now() - 86400000 * 5 },
+      { id: 2, cat: 'software', ico: '💻', badge: 'new', bt: 'নতুন', name: 'HR Management Software', desc: 'ছোট ব্যবসার জন্য সম্পূর্ণ কর্মী ব্যবস্থাপনা।', price: 3500, old: 6000, file: '#', status: 'active', ts: Date.now() - 86400000 * 3 },
+      { id: 3, cat: 'script', ico: '🌐', badge: 'sale', bt: 'অফার', name: 'E-Commerce PHP Script', desc: 'সম্পূর্ণ ই-কমার্স ওয়েবসাইট।', price: 2200, old: 4500, file: '#', status: 'active', ts: Date.now() - 86400000 * 2 },
+      { id: 4, cat: 'ebook', ico: '📚', badge: '', bt: '', name: 'ফ্রিল্যান্সিং গাইড ২০২৫', desc: 'Upwork ও Fiverr থেকে ক্লায়েন্ট।', price: 299, old: 599, file: '#', status: 'active', ts: Date.now() - 86400000 },
+      { id: 5, cat: 'course', ico: '🐍', badge: 'hot', bt: 'বেস্টসেলার', name: 'Python Machine Learning', desc: 'শূন্য থেকে AI/ML বাংলা কোর্স।', price: 1800, old: 3500, file: '#', status: 'active', ts: Date.now() },
+      { id: 6, cat: 'script', ico: '📱', badge: 'new', bt: 'নতুন', name: 'React Native App Template', desc: 'Food Delivery App সোর্স কোড।', price: 4500, old: 8000, file: '#', status: 'active', ts: Date.now() },
+    ];
+  },
+  saveProducts(p) { this.s('premiumProducts', p) },
+  users() { return this.g('premiumUsers') || [] },
+  saveUsers(u) { this.s('premiumUsers', u) },
+  cfg() {
+    return this.g('premiumConfig') || {
+      bkash: '01700000000', nagad: '01800000000', whatsapp: '01700000000',
+      siteName: 'Premium', adminEmail: 'admin@premium.com', adminPass: 'admin123',
+      contactEmail: 'info@premium.com.bd'
+    };
+  },
+  saveCfg(c) { this.s('premiumConfig', c) },
+  coupons() { return this.g('premiumCoupons') || [] },
+  saveCoupons(c) { this.s('premiumCoupons', c) },
+  logs() { return this.g('premiumLogs') || [] },
+  addLog(type, msg) {
+    const l = this.logs();
+    l.unshift({ type, msg, time: new Date().toLocaleString('bn-BD'), ts: Date.now() });
+    if (l.length > 500) l.splice(500);
+    this.s('premiumLogs', l);
+    pushNotif(msg);
+  },
+  notifs() { return this.g('premiumNotifs') || [] },
+  saveNotifs(n) { this.s('premiumNotifs', n) },
+};
+
+// ════════════════════════════════════════════════════════
+//  AUTH
+// ════════════════════════════════════════════════════════
+function doLogin() {
+  const email = document.getElementById('lEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('lPass').value;
+  const cfg = DB.cfg();
+  if (email === cfg.adminEmail.toLowerCase() && pass === cfg.adminPass) {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('appWrap').style.display = 'flex';
+    document.getElementById('sbName').textContent = 'Admin';
+    document.getElementById('tbName').textContent = 'Admin';
+    document.getElementById('tbAva').textContent = 'A';
+    DB.s('premiumSession', { email: cfg.adminEmail });
+    DB.addLog('admin_login', 'Admin প্যানেলে লগইন করেছেন');
+    initApp();
+  } else {
+    const e = document.getElementById('lErr');
+    e.textContent = 'ভুল ইমেইল বা পাসওয়ার্ড!';
+    e.style.display = 'block';
+    setTimeout(() => e.style.display = 'none', 3000);
+  }
+}
+function doLogout() {
+  if (!confirm('লগআউট করবেন?')) return;
+  localStorage.removeItem('premiumSession');
+  document.getElementById('appWrap').style.display = 'none';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('lPass').value = '';
+}
+
+// ════════════════════════════════════════════════════════
+//  PAGE NAVIGATION
+// ════════════════════════════════════════════════════════
+const pageTitles = { dashboard: 'ড্যাশবোর্ড', orders: 'অর্ডার সমূহ', payments: 'পেমেন্ট যাচাই', products: 'প্রোডাক্ট', addprod: 'নতুন প্রোডাক্ট', users: 'ব্যবহারকারী', coupons: 'কুপন ও ডিসকাউন্ট', analytics: 'অ্যানালিটিক্স', settings: 'সেটিংস', logs: 'লগ ও অ্যাক্টিভিটি' };
+const pageRenders = { dashboard: renderDashboard, orders: renderOrders, payments: renderPayments, products: renderProdsAdmin, users: renderUsers, coupons: renderCoupons, analytics: renderAnalytics, settings: renderSettings, logs: renderLogs };
+
+function showPage(id, el) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.sbi').forEach(b => b.classList.remove('on'));
+  document.getElementById('pg-' + id).classList.add('on');
+  if (el) el.classList.add('on');
+  document.getElementById('tbTitle').textContent = pageTitles[id] || id;
+  if (pageRenders[id]) pageRenders[id]();
+  // close notif panel
+  document.getElementById('notifPanel').classList.remove('on');
+}
+
+// ════════════════════════════════════════════════════════
+//  DASHBOARD
+// ════════════════════════════════════════════════════════
+function renderDashboard() {
+  const orders = DB.orders();
+  const today = new Date().toDateString();
+  const todaySales = orders.filter(o => new Date(o.ts).toDateString() === today && o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0);
+  const total = orders.filter(o => o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0);
+  const pending = orders.filter(o => o.status === 'pending').length;
+  const delivered = orders.filter(o => o.status === 'delivered').length;
+  const prods = DB.products().filter(p => p.status === 'active').length;
+  const users = DB.users().length;
+
+  // Sidebar badges
+  const pb = document.getElementById('pBadge');
+  pb.textContent = pending; pb.style.display = pending ? '' : 'none';
+  const ppb = document.getElementById('ppBadge');
+  ppb.textContent = pending; ppb.style.display = pending ? '' : 'none';
+  // Notif dot
+  const notifs = DB.notifs().filter(n => !n.read);
+  document.getElementById('ndot').style.display = notifs.length ? '' : 'none';
+
+  document.getElementById('statRow').innerHTML = `
+    <div class="sc"><div class="sc-ico">💰</div><div class="sc-val">৳${total.toLocaleString()}</div><div class="sc-lbl">মোট আয়</div><div class="sc-chg up">▲ আজ ৳${todaySales.toLocaleString()}</div></div>
+    <div class="sc"><div class="sc-ico">📦</div><div class="sc-val">${orders.length}</div><div class="sc-lbl">মোট অর্ডার</div><div class="sc-chg up">✓ ${delivered} ডেলিভারড</div></div>
+    <div class="sc"><div class="sc-ico">⏳</div><div class="sc-val" style="color:var(--yw)">${pending}</div><div class="sc-lbl">পেন্ডিং</div><div class="sc-chg ${pending ? 'dn' : 'neu'}">${pending ? '● যাচাই প্রয়োজন' : '✓ সব ঠিক আছে'}</div></div>
+    <div class="sc"><div class="sc-ico">👤</div><div class="sc-val">${users}</div><div class="sc-lbl">মোট ইউজার</div><div class="sc-chg neu">${prods} টি প্রোডাক্ট</div></div>`;
+
+  // 7-day sales chart
+  const days = [], dayN = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days.push(d.toDateString());
+    dayN.push(['রবি', 'সোম', 'মঙ্গল', 'বুধ', 'বৃহ', 'শুক্র', 'শনি'][d.getDay()]);
+  }
+  const sales = days.map(d => orders.filter(o => new Date(o.ts).toDateString() === d && o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0));
+  const mx = Math.max(...sales, 1);
+  document.getElementById('salesChart').innerHTML = sales.map((s, i) => `
+    <div class="bar" style="height:${Math.max(4, Math.round(s / mx * 100))}%;background:${s > 0 ? 'rgba(184,150,62,.55)' : 'rgba(184,150,62,.1)'}">
+      <span class="bar-lbl">${dayN[i]}</span>
+      <span class="bar-val">৳${s.toLocaleString()}</span>
+    </div>`).join('');
+
+  // Category chart
+  const cats = { course: 'কোর্স', software: 'সফটওয়্যার', script: 'স্ক্রিপ্ট', ebook: 'ই-বুক' };
+  const catCnt = {};
+  orders.filter(o => o.status !== 'rejected').forEach(o => {
+    const p = DB.products().find(p => p.id === o.productId);
+    if (p) catCnt[p.cat] = (catCnt[p.cat] || 0) + 1;
+  });
+  const mxC = Math.max(...Object.values(catCnt), 1);
+  document.getElementById('catChart').innerHTML = Object.entries(catCnt).map(([k, v]) => `
+    <div class="cat-bar-row">
+      <span class="cat-bar-lbl">${cats[k] || k}</span>
+      <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.round(v / mxC * 100)}%"></div></div>
+      <span class="cat-bar-val">${v}</span>
+    </div>`).join('') || '<div style="color:var(--mu);font-size:13px;padding:8px">ডেটা নেই</div>';
+
+  // Recent orders
+  const rec = orders.slice(0, 7);
+  document.getElementById('recentOrd').innerHTML = rec.length
+    ? rec.map(o => `<tr>
+        <td><div style="font-weight:600;font-size:13px">${o.name}</div><div style="font-size:11px;color:var(--mu)">${o.email}</div></td>
+        <td style="max-width:130px;font-size:12px">${o.productName}</td>
+        <td style="color:var(--g);font-family:'Playfair Display',serif;font-size:16px">৳${Number(o.price).toLocaleString()}</td>
+        <td><span class="badge b-${o.status}">${stLbl(o.status)}</span></td>
+      </tr>`).join('')
+    : '<tr><td colspan="4" style="text-align:center;padding:30px;color:var(--mu)">কোনো অর্ডার নেই</td></tr>';
+
+  // Top products
+  const prodSales = {};
+  orders.filter(o => o.status !== 'rejected').forEach(o => {
+    prodSales[o.productId] = (prodSales[o.productId] || 0) + 1;
+  });
+  const topProds = Object.entries(prodSales).sort((a, b) => b[1] - a[1]).slice(0, 5);
+  document.getElementById('topProdList').innerHTML = topProds.length
+    ? topProds.map(([id, cnt]) => {
+        const p = DB.products().find(p => p.id == id);
+        return p ? `<div style="display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid rgba(184,150,62,.05)">
+          <span style="font-size:22px">${p.ico || '📦'}</span>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.name}</div><div style="font-size:11px;color:var(--mu)">৳${Number(p.price).toLocaleString()}</div></div>
+          <span style="background:rgba(184,150,62,.12);color:var(--g);border:1px solid rgba(184,150,62,.25);font-size:11px;font-weight:700;padding:3px 9px;border-radius:100px">${cnt} বিক্রয়</span>
+        </div>` : '';
+      }).join('')
+    : '<div style="padding:30px;text-align:center;color:var(--mu);font-size:13px">ডেটা নেই</div>';
+}
+
+// ════════════════════════════════════════════════════════
+//  ORDERS
+// ════════════════════════════════════════════════════════
+function renderOrders() {
+  let orders = DB.orders();
+  const q = (document.getElementById('ordQ')?.value || '').toLowerCase();
+  const s = document.getElementById('ordS')?.value || 'all';
+  const p = document.getElementById('ordP')?.value || 'all';
+  const d = document.getElementById('ordD')?.value || 'all';
+
+  if (q) orders = orders.filter(o => o.name.toLowerCase().includes(q) || o.email.toLowerCase().includes(q) || o.trx.toLowerCase().includes(q) || o.productName.toLowerCase().includes(q));
+  if (s !== 'all') orders = orders.filter(o => o.status === s);
+  if (p !== 'all') orders = orders.filter(o => o.payment === p);
+  if (d !== 'all') {
+    const now = new Date();
+    orders = orders.filter(o => {
+      const od = new Date(o.ts);
+      if (d === 'today') return od.toDateString() === now.toDateString();
+      if (d === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); return od >= w; }
+      if (d === 'month') { const m = new Date(now); m.setDate(now.getDate() - 30); return od >= m; }
+      return true;
+    });
+  }
+
+  updateBadges();
+  document.getElementById('ordCount').textContent = `মোট: ${orders.length}টি অর্ডার`;
+  document.getElementById('ordBody').innerHTML = orders.length
+    ? orders.map(o => `<tr>
+        <td style="font-size:11px;color:var(--mu)">${o.id}</td>
+        <td style="font-size:11px;color:var(--mu)">${o.date}</td>
+        <td><div style="font-weight:600">${o.name}</div><div style="font-size:11px;color:var(--mu)">${o.email}</div></td>
+        <td style="max-width:130px;font-size:12px">${o.productIco || '📦'} ${o.productName}</td>
+        <td>${o.payment === 'bkash' ? '🟣' : '🟠'} ${o.payment.toUpperCase()}</td>
+        <td style="font-family:monospace;font-size:12px;color:var(--g)">${o.trx}</td>
+        <td style="color:var(--g);font-family:'Playfair Display',serif;font-size:16px">৳${Number(o.price).toLocaleString()}</td>
+        <td><span class="badge b-${o.status}">${stLbl(o.status)}</span></td>
+        <td><div class="abtns">
+          ${o.status === 'pending' ? `<button class="abtn abtn-g" onclick="approveOrder('${o.id}')">✓ অনুমোদন</button><button class="abtn abtn-r" onclick="rejectOrder('${o.id}')">✕ প্রত্যাখ্যান</button>` : ''}
+          ${o.status === 'approved' ? `<button class="abtn abtn-b" onclick="markDelivered('${o.id}')">📧 ডেলিভারড</button>` : ''}
+          <button class="abtn abtn-y" onclick="viewOrder('${o.id}')">👁 দেখুন</button>
+        </div></td>
+      </tr>`).join('')
+    : '<tr><td colspan="9" style="text-align:center;padding:40px;color:var(--mu)">কোনো অর্ডার পাওয়া যায়নি</td></tr>';
+}
+
+function approveOrder(id) {
+  const orders = DB.orders();
+  const i = orders.findIndex(o => o.id === id);
+  if (i < 0) return;
+  orders[i].status = 'approved';
+  DB.saveOrders(orders);
+  DB.addLog('payment', `অর্ডার অনুমোদিত: ${orders[i].name} → ${orders[i].productName}`);
+  renderOrders(); renderDashboard();
+  toast('✅', `অর্ডার অনুমোদিত! ${orders[i].email}-এ ডেলিভারি দিন।`);
+}
+function rejectOrder(id) {
+  if (!confirm('এই অর্ডারটি প্রত্যাখ্যান করবেন?')) return;
+  const orders = DB.orders();
+  const i = orders.findIndex(o => o.id === id);
+  if (i < 0) return;
+  orders[i].status = 'rejected';
+  DB.saveOrders(orders);
+  DB.addLog('payment', `অর্ডার প্রত্যাখ্যাত: ${orders[i].name} → ${orders[i].productName}`);
+  renderOrders(); renderDashboard();
+  toast('❌', 'অর্ডার প্রত্যাখ্যাত করা হয়েছে।');
+}
+function markDelivered(id) {
+  const orders = DB.orders();
+  const i = orders.findIndex(o => o.id === id);
+  if (i < 0) return;
+  orders[i].status = 'delivered';
+  orders[i].deliveredAt = new Date().toLocaleString('bn-BD');
+  DB.saveOrders(orders);
+  DB.addLog('payment', `ডেলিভারড: ${orders[i].name} → ${orders[i].productName}`);
+  renderOrders(); renderDashboard();
+  toast('📧', 'ডেলিভারড চিহ্নিত! ইমেইল পাঠানো নিশ্চিত করুন।');
+}
+
+function viewOrder(id) {
+  const o = DB.orders().find(o => o.id === id);
+  if (!o) return;
+  const prod = DB.products().find(p => p.id === o.productId);
+  document.getElementById('ordModalBd').innerHTML = `
+    ${[
+      ['অর্ডার ID', o.id], ['তারিখ', o.date], ['গ্রাহকের নাম', o.name],
+      ['ইমেইল', o.email], ['প্রোডাক্ট', `${o.productIco || ''} ${o.productName}`],
+      ['পেমেন্ট পদ্ধতি', o.payment === 'bkash' ? '🟣 বিকাশ' : '🟠 নগদ'],
+      ['ট্রানজেকশন ID', `<code style="background:rgba(184,150,62,.1);padding:2px 8px;border-radius:2px;color:var(--g)">${o.trx}</code>`],
+      ['মূল মূল্য', `৳${Number(o.origPrice || o.price).toLocaleString()}`],
+      ...(o.discount > 0 ? [['কুপন ছাড়', `৳${Number(o.discount).toLocaleString()} (${o.coupon})`]] : []),
+      ['পরিশোধিত', `<span style="color:var(--g);font-family:'Playfair Display',serif;font-size:20px">৳${Number(o.price).toLocaleString()}</span>`],
+      ['স্ট্যাটাস', `<span class="badge b-${o.status}">${stLbl(o.status)}</span>`],
+      ...(prod?.file && prod.file !== '#' ? [['ডাউনলোড লিংক', `<a href="${prod.file}" target="_blank" style="color:var(--bl)">লিংক খুলুন ↗</a>`]] : []),
+      ...(o.deliveredAt ? [['ডেলিভারি সময়', o.deliveredAt]] : []),
+    ].map(([l, v]) => `<div class="detail-row"><span class="dl">${l}</span><span class="dv">${v}</span></div>`).join('')}
+    <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap">
+      ${o.status === 'pending' ? `<button class="fbtn fbtn-g" onclick="approveOrder('${o.id}');closeModal('ordModal')">✓ অনুমোদন করুন</button><button class="fbtn fbtn-r" onclick="rejectOrder('${o.id}');closeModal('ordModal')" style="font-size:13px;padding:10px 18px">✕ প্রত্যাখ্যান</button>` : ''}
+      ${o.status === 'approved' ? `<button class="fbtn fbtn-g" onclick="markDelivered('${o.id}');closeModal('ordModal')">📧 ডেলিভারড চিহ্নিত করুন</button>` : ''}
+    </div>`;
+  document.getElementById('ordModal').classList.add('on');
+}
+
+// ════════════════════════════════════════════════════════
+//  PAYMENTS
+// ════════════════════════════════════════════════════════
+function renderPayments() {
+  let orders = DB.orders();
+  const q = (document.getElementById('payQ')?.value || '').toLowerCase();
+  const s = document.getElementById('payS')?.value || 'pending';
+  const m = document.getElementById('payM')?.value || 'all';
+
+  if (s !== 'all') orders = orders.filter(o => o.status === s);
+  if (q) orders = orders.filter(o => o.trx.toLowerCase().includes(q) || o.name.toLowerCase().includes(q));
+  if (m !== 'all') orders = orders.filter(o => o.payment === m);
+
+  const pending = DB.orders().filter(o => o.status === 'pending').length;
+  document.getElementById('payPendingCount').textContent = `পেন্ডিং: ${pending}টি`;
+
+  document.getElementById('payBody').innerHTML = orders.length
+    ? orders.map(o => `<tr>
+        <td style="font-size:11px;color:var(--mu)">${o.date}</td>
+        <td><div style="font-weight:600">${o.name}</div><div style="font-size:11px;color:var(--mu)">${o.email}</div></td>
+        <td style="font-size:12px;max-width:130px">${o.productIco || '📦'} ${o.productName}</td>
+        <td>${o.payment === 'bkash' ? '🟣 বিকাশ' : '🟠 নগদ'}</td>
+        <td style="font-family:monospace;font-size:12px;color:var(--g);font-weight:600">${o.trx}</td>
+        <td style="color:var(--g);font-family:'Playfair Display',serif;font-size:16px">৳${Number(o.price).toLocaleString()}</td>
+        <td><span class="badge b-${o.status}">${stLbl(o.status)}</span></td>
+        <td><div class="abtns">
+          ${o.status === 'pending' ? `<button class="abtn abtn-g" onclick="approveOrder('${o.id}');renderPayments()">✓ অনুমোদন</button><button class="abtn abtn-r" onclick="rejectOrder('${o.id}');renderPayments()">✕ প্রত্যাখ্যান</button>` : ''}
+          ${o.status === 'approved' ? `<button class="abtn abtn-b" onclick="markDelivered('${o.id}');renderPayments()">📧 ডেলিভারড</button>` : ''}
+          <button class="abtn abtn-y" onclick="viewOrder('${o.id}')">👁</button>
+        </div></td>
+      </tr>`).join('')
+    : '<tr><td colspan="8" style="text-align:center;padding:40px;color:var(--mu)">কোনো পেমেন্ট পাওয়া যায়নি</td></tr>';
+}
+
+// ════════════════════════════════════════════════════════
+//  PRODUCTS ADMIN
+// ════════════════════════════════════════════════════════
+const catMap = { course: 'কোর্স', software: 'সফটওয়্যার', script: 'স্ক্রিপ্ট', ebook: 'ই-বুক' };
+const badgeTxt = { hot: '🔥', new: '✨', sale: '💰' };
+
+function renderProdsAdmin() {
+  let prods = DB.products();
+  const q = (document.getElementById('prodQ')?.value || '').toLowerCase();
+  const cf = document.getElementById('prodCatF')?.value || 'all';
+  const sf = document.getElementById('prodStatF')?.value || 'all';
+
+  if (q) prods = prods.filter(p => p.name.toLowerCase().includes(q) || (p.desc || '').toLowerCase().includes(q));
+  if (cf !== 'all') prods = prods.filter(p => p.cat === cf);
+  if (sf !== 'all') prods = prods.filter(p => p.status === sf);
+
+  document.getElementById('prodGrid').innerHTML = prods.length
+    ? prods.map(p => `
+      <div class="pac ${p.status !== 'active' ? 'inactive' : ''}">
+        ${p.badge ? `<span class="pac-top-badge ${p.badge}">${badgeTxt[p.badge] || ''} ${p.bt}</span>` : ''}
+        <div class="pac-ico">${p.ico || '📦'}</div>
+        <div class="pac-cat">${catMap[p.cat] || p.cat}</div>
+        <div class="pac-name">${p.name}</div>
+        <div style="margin-top:5px;display:flex;align-items:baseline;gap:4px">
+          <span class="pac-price">৳${Number(p.price).toLocaleString()}</span>
+          <span class="pac-old">৳${Number(p.old || 0).toLocaleString()}</span>
+        </div>
+        <span class="badge b-${p.status}" style="margin-top:7px;display:inline-block">${p.status === 'active' ? 'Active' : p.status === 'draft' ? 'Draft' : 'Hidden'}</span>
+        <div class="pac-actions">
+          <button class="abtn abtn-y" onclick="editProd(${p.id})">✏️ সম্পাদনা</button>
+          <button class="abtn ${p.status === 'active' ? 'abtn-mu' : 'abtn-g'}" onclick="toggleProd(${p.id})">${p.status === 'active' ? '⏸ নিষ্ক্রিয়' : '▶ সক্রিয়'}</button>
+          <button class="abtn abtn-r" onclick="deleteProd(${p.id})">🗑 মুছুন</button>
+        </div>
+      </div>`).join('')
+    : '<div class="empty" style="grid-column:1/-1"><div class="empty-i">📭</div><p>কোনো প্রোডাক্ট পাওয়া যায়নি</p></div>';
+}
+
+function editProd(id) {
+  const p = DB.products().find(p => p.id === id);
+  if (!p) return;
+  document.getElementById('editId').value = id;
+  document.getElementById('pName').value = p.name;
+  document.getElementById('pCat').value = p.cat;
+  document.getElementById('pStatus').value = p.status || 'active';
+  document.getElementById('pIco').value = p.ico || '';
+  document.getElementById('pBadge').value = p.badge || '';
+  document.getElementById('pPrice').value = p.price;
+  document.getElementById('pOld').value = p.old || '';
+  document.getElementById('pFile').value = p.file || '';
+  document.getElementById('pDesc').value = p.desc || '';
+  document.getElementById('apTitle').textContent = 'প্রোডাক্ট সম্পাদনা';
+  showPage('addprod', null);
+  document.querySelector('.sbi[onclick*="addprod"]')?.classList.add('on');
+}
+
+function saveProd() {
+  const name = document.getElementById('pName').value.trim();
+  const cat = document.getElementById('pCat').value;
+  const price = document.getElementById('pPrice').value;
+  const file = document.getElementById('pFile').value.trim();
+  const desc = document.getElementById('pDesc').value.trim();
+  if (!name || !cat || !price || !desc) { toast('❌', 'সব প্রয়োজনীয় তথ্য দিন!'); return }
+
+  const badge = document.getElementById('pBadge').value;
+  const btMap = { hot: 'জনপ্রিয়', new: 'নতুন', sale: 'অফার' };
+  const editId = Number(document.getElementById('editId').value || 0);
+  const prod = {
+    id: editId || Date.now(),
+    name, cat,
+    ico: document.getElementById('pIco').value || '📦',
+    badge, bt: btMap[badge] || '',
+    price: Number(price),
+    old: Number(document.getElementById('pOld').value || 0),
+    file: file || '#',
+    desc,
+    status: document.getElementById('pStatus').value || 'active',
+    ts: Date.now()
+  };
+
+  const prods = DB.products();
+  if (editId) { const i = prods.findIndex(p => p.id === editId); if (i >= 0) prods[i] = prod; else prods.unshift(prod); }
+  else prods.unshift(prod);
+  DB.saveProducts(prods);
+  DB.addLog('product', `প্রোডাক্ট ${editId ? 'আপডেট' : 'যোগ'} করা হয়েছে: ${name}`);
+  clearProdForm();
+  showPage('products', null);
+  toast('✅', editId ? 'প্রোডাক্ট আপডেট হয়েছে!' : 'নতুন প্রোডাক্ট যোগ হয়েছে!');
+}
+
+function clearProdForm() {
+  ['pName', 'pIco', 'pPrice', 'pOld', 'pFile', 'pDesc'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('pCat').value = '';
+  document.getElementById('pBadge').value = '';
+  document.getElementById('pStatus').value = 'active';
+  document.getElementById('editId').value = '';
+  document.getElementById('apTitle').textContent = 'নতুন প্রোডাক্ট যোগ করুন';
+}
+
+function toggleProd(id) {
+  const prods = DB.products();
+  const i = prods.findIndex(p => p.id === id);
+  if (i < 0) return;
+  prods[i].status = prods[i].status === 'active' ? 'hidden' : 'active';
+  DB.saveProducts(prods);
+  DB.addLog('product', `প্রোডাক্ট ${prods[i].status === 'active' ? 'সক্রিয়' : 'নিষ্ক্রিয়'}: ${prods[i].name}`);
+  renderProdsAdmin();
+  toast(prods[i].status === 'active' ? '▶️' : '⏸️', `প্রোডাক্ট ${prods[i].status === 'active' ? 'সক্রিয়' : 'নিষ্ক্রিয়'} করা হয়েছে।`);
+}
+
+function deleteProd(id) {
+  if (!confirm('এই প্রোডাক্টটি মুছে ফেলবেন?')) return;
+  const prods = DB.products().filter(p => p.id !== id);
+  DB.saveProducts(prods);
+  DB.addLog('product', `প্রোডাক্ট মুছে ফেলা হয়েছে`);
+  renderProdsAdmin();
+  toast('🗑️', 'প্রোডাক্ট মুছে গেছে।');
+}
+
+// ════════════════════════════════════════════════════════
+//  USERS
+// ════════════════════════════════════════════════════════
+function renderUsers() {
+  let users = DB.users();
+  const q = (document.getElementById('userQ')?.value || '').toLowerCase();
+  const f = document.getElementById('userF')?.value || 'all';
+
+  if (q) users = users.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+  if (f === 'active') users = users.filter(u => !u.banned);
+  if (f === 'banned') users = users.filter(u => u.banned);
+
+  document.getElementById('userCount').textContent = `মোট: ${DB.users().length} জন`;
+  document.getElementById('userCountFt').textContent = `দেখাচ্ছে: ${users.length} জন`;
+
+  const orders = DB.orders();
+  document.getElementById('userBody').innerHTML = users.length
+    ? users.map(u => {
+        const uOrders = orders.filter(o => o.userId === u.id || o.email === u.email);
+        const totalSpent = uOrders.filter(o => o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0);
+        return `<tr>
+          <td><div style="font-weight:600">${u.name}</div></td>
+          <td style="font-size:12px;color:var(--mu)">${u.email}</td>
+          <td style="font-size:12px;color:var(--mu)">${u.joinDate || '—'}</td>
+          <td style="text-align:center">${uOrders.length}</td>
+          <td style="color:var(--g);font-family:'Playfair Display',serif;font-size:15px">৳${totalSpent.toLocaleString()}</td>
+          <td><span class="badge ${u.banned ? 'b-banned' : 'b-user'}">${u.banned ? 'নিষিদ্ধ' : 'সক্রিয়'}</span></td>
+          <td><div class="abtns">
+            <button class="abtn abtn-y" onclick="viewUser('${u.id}')">👁 দেখুন</button>
+            <button class="abtn ${u.banned ? 'abtn-g' : 'abtn-r'}" onclick="toggleBan('${u.id}')">${u.banned ? '✓ Unban' : '🚫 Ban'}</button>
+          </div></td>
+        </tr>`;
+      }).join('')
+    : '<tr><td colspan="7" style="text-align:center;padding:40px;color:var(--mu)">কোনো ইউজার পাওয়া যায়নি</td></tr>';
+}
+
+function toggleBan(id) {
+  const users = DB.users();
+  const i = users.findIndex(u => u.id === id);
+  if (i < 0) return;
+  users[i].banned = !users[i].banned;
+  DB.saveUsers(users);
+  DB.addLog('admin_login', `ইউজার ${users[i].banned ? 'নিষিদ্ধ' : 'সক্রিয়'}: ${users[i].email}`);
+  renderUsers();
+  toast(users[i].banned ? '🚫' : '✅', `ইউজার ${users[i].banned ? 'নিষিদ্ধ' : 'সক্রিয়'} করা হয়েছে।`);
+}
+
+function viewUser(id) {
+  const u = DB.users().find(u => u.id === id);
+  if (!u) return;
+  const orders = DB.orders().filter(o => o.userId === u.id || o.email === u.email);
+  const totalSpent = orders.filter(o => o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0);
+  const stMap = { pending: 'পেন্ডিং', approved: 'অনুমোদিত', delivered: 'ডেলিভারড', rejected: 'প্রত্যাখ্যাত' };
+
+  document.getElementById('userModalBd').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;margin-bottom:18px">
+      ${[['নাম', u.name], ['ইমেইল', u.email], ['নিবন্ধন তারিখ', u.joinDate || '—'], ['স্ট্যাটাস', `<span class="badge ${u.banned ? 'b-banned' : 'b-user'}">${u.banned ? 'নিষিদ্ধ' : 'সক্রিয়'}</span>`], ['মোট অর্ডার', orders.length + 'টি'], ['মোট ব্যয়', `<span style="color:var(--g);font-family:'Playfair Display',serif;font-size:18px">৳${totalSpent.toLocaleString()}</span>`]]
+        .map(([l, v]) => `<div style="background:var(--dk4);padding:14px 16px;border:1px solid rgba(184,150,62,.07)"><div style="font-size:11px;color:var(--mu);margin-bottom:4px">${l}</div><div style="font-size:14px;font-weight:500">${v}</div></div>`).join('')}
+    </div>
+    <h4 style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;margin-bottom:10px">অর্ডার ইতিহাস</h4>
+    ${orders.length ? orders.map(o => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid rgba(184,150,62,.05);flex-wrap:wrap;gap:8px">
+        <div><div style="font-size:13px;font-weight:600">${o.productIco || '📦'} ${o.productName}</div><div style="font-size:11px;color:var(--mu)">${o.date} · ${o.payment.toUpperCase()}</div></div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="color:var(--g);font-family:'Playfair Display',serif">৳${Number(o.price).toLocaleString()}</span>
+          <span class="badge b-${o.status}">${stMap[o.status] || o.status}</span>
+        </div>
+      </div>`).join('') : '<div style="padding:24px;text-align:center;color:var(--mu);font-size:13px">কোনো অর্ডার নেই</div>'}
+    <div style="margin-top:16px;display:flex;gap:8px">
+      <button class="fbtn ${u.banned ? 'fbtn-g' : 'fbtn-r'}" onclick="toggleBan('${u.id}');closeModal('userModal')" style="font-size:13px;padding:10px 18px">${u.banned ? '✓ Unban করুন' : '🚫 Ban করুন'}</button>
+    </div>`;
+  document.getElementById('userModal').classList.add('on');
+}
+
+// ════════════════════════════════════════════════════════
+//  COUPONS
+// ════════════════════════════════════════════════════════
+function renderCoupons() {
+  const cps = DB.coupons();
+  document.getElementById('cpList').innerHTML = cps.length
+    ? cps.map(c => `
+      <div class="cp-card">
+        <div>
+          <div class="cp-code">${c.code}</div>
+          <div class="cp-meta">${c.type === 'percent' ? c.value + '% ছাড়' : '৳' + c.value + ' ছাড়'} · ব্যবহার: ${c.used || 0}/${c.limit || '∞'} ${c.expiry ? '· মেয়াদ: ' + c.expiry : ''}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+          <span class="badge ${c.active ? 'b-active' : 'b-hidden'}">${c.active ? 'সক্রিয়' : 'নিষ্ক্রিয়'}</span>
+          <button class="abtn ${c.active ? 'abtn-mu' : 'abtn-g'}" onclick="toggleCoupon('${c.id}')">${c.active ? '⏸' : '▶'}</button>
+          <button class="abtn abtn-r" onclick="deleteCoupon('${c.id}')">🗑</button>
+        </div>
+      </div>`).join('')
+    : '<div style="padding:24px;text-align:center;color:var(--mu);font-size:13px">কোনো কুপন নেই</div>';
+}
+
+function saveCoupon() {
+  const code = document.getElementById('cpCode').value.trim().toUpperCase();
+  const type = document.getElementById('cpType').value;
+  const val = Number(document.getElementById('cpVal').value);
+  if (!code || !val) { toast('❌', 'কোড ও মান দিন!'); return }
+
+  const cps = DB.coupons();
+  const editId = document.getElementById('cpId').value;
+  if (!editId && cps.find(c => c.code === code)) { toast('❌', 'এই কোড ইতিমধ্যে আছে!'); return }
+
+  const cp = {
+    id: editId || 'CP-' + Date.now(), code, type, value: val,
+    expiry: document.getElementById('cpExpiry').value || '',
+    limit: Number(document.getElementById('cpLimit').value || 0),
+    used: 0, active: true, ts: Date.now()
+  };
+  if (editId) { const i = cps.findIndex(c => c.id === editId); if (i >= 0) cps[i] = { ...cps[i], ...cp }; }
+  else cps.unshift(cp);
+  DB.saveCoupons(cps);
+  DB.addLog('coupon', `নতুন কুপন: ${code} (${type === 'percent' ? val + '%' : '৳' + val} ছাড়)`);
+  clearCpForm(); renderCoupons();
+  toast('✅', `কুপন "${code}" তৈরি হয়েছে!`);
+}
+
+function toggleCoupon(id) {
+  const cps = DB.coupons();
+  const i = cps.findIndex(c => c.id === id);
+  if (i < 0) return;
+  cps[i].active = !cps[i].active;
+  DB.saveCoupons(cps);
+  renderCoupons();
+  toast(cps[i].active ? '▶️' : '⏸️', `কুপন ${cps[i].active ? 'সক্রিয়' : 'নিষ্ক্রিয়'} করা হয়েছে।`);
+}
+
+function deleteCoupon(id) {
+  if (!confirm('কুপনটি মুছবেন?')) return;
+  DB.saveCoupons(DB.coupons().filter(c => c.id !== id));
+  renderCoupons();
+  toast('🗑️', 'কুপন মুছে গেছে।');
+}
+
+function clearCpForm() {
+  ['cpCode', 'cpVal', 'cpExpiry'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('cpLimit').value = '0';
+  document.getElementById('cpType').value = 'percent';
+  document.getElementById('cpId').value = '';
+}
+
+// ════════════════════════════════════════════════════════
+//  ANALYTICS
+// ════════════════════════════════════════════════════════
+function renderAnalytics() {
+  const orders = DB.orders();
+  const validOrders = orders.filter(o => o.status !== 'rejected');
+  const total = validOrders.reduce((s, o) => s + Number(o.price), 0);
+  const now = new Date();
+  const thisMonth = validOrders.filter(o => { const d = new Date(o.ts); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
+  const monthTotal = thisMonth.reduce((s, o) => s + Number(o.price), 0);
+  const users = DB.users().length;
+  const conversion = orders.length > 0 ? Math.round(validOrders.length / orders.length * 100) : 0;
+
+  document.getElementById('anRow').innerHTML = `
+    <div class="an-c"><div class="an-val">৳${total.toLocaleString()}</div><div class="an-lbl">মোট আয়</div></div>
+    <div class="an-c"><div class="an-val">৳${monthTotal.toLocaleString()}</div><div class="an-lbl">এই মাসের আয়</div></div>
+    <div class="an-c"><div class="an-val">${orders.length}</div><div class="an-lbl">মোট অর্ডার</div></div>
+    <div class="an-c"><div class="an-val">${users}</div><div class="an-lbl">মোট ইউজার</div></div>
+    <div class="an-c"><div class="an-val">${conversion}%</div><div class="an-lbl">সফল রেট</div></div>
+    <div class="an-c"><div class="an-val">${total && validOrders.length ? Math.round(total / validOrders.length).toLocaleString() : 0}</div><div class="an-lbl">গড় অর্ডার মূল্য</div></div>`;
+
+  // 30-day chart
+  const days30 = [], dayN30 = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(); d.setDate(d.getDate() - i);
+    days30.push(d.toDateString()); dayN30.push(d.getDate());
+  }
+  const sales30 = days30.map(d => orders.filter(o => new Date(o.ts).toDateString() === d && o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0));
+  const mx30 = Math.max(...sales30, 1);
+  document.getElementById('an30Chart').innerHTML = sales30.map((s, i) => `
+    <div class="bar" style="height:${Math.max(2, Math.round(s / mx30 * 100))}%;background:${s > 0 ? 'rgba(184,150,62,.5)' : 'rgba(184,150,62,.08)'}">
+      <span class="bar-lbl" style="font-size:8px">${i % 5 === 0 ? dayN30[i] : ''}</span>
+      <span class="bar-val">৳${s.toLocaleString()}</span>
+    </div>`).join('');
+
+  // Payment method chart
+  const bkash = validOrders.filter(o => o.payment === 'bkash').length;
+  const nagad = validOrders.filter(o => o.payment === 'nagad').length;
+  const totalPay = bkash + nagad || 1;
+  document.getElementById('payMethodChart').innerHTML = `
+    <div class="cat-bar-row"><span class="cat-bar-lbl">বিকাশ</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.round(bkash / totalPay * 100)}%;background:linear-gradient(90deg,#E2136E,#FF6BA8)"></div></div><span class="cat-bar-val">${bkash}</span></div>
+    <div class="cat-bar-row"><span class="cat-bar-lbl">নগদ</span><div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.round(nagad / totalPay * 100)}%;background:linear-gradient(90deg,#F05A28,#FF9066)"></div></div><span class="cat-bar-val">${nagad}</span></div>`;
+
+  // Top products
+  const prodSales = {};
+  validOrders.forEach(o => { prodSales[o.productId] = (prodSales[o.productId] || 0) + 1; });
+  const topProds = Object.entries(prodSales).sort((a, b) => b[1] - a[1]).slice(0, 10);
+  const mxP = Math.max(...topProds.map(([, v]) => v), 1);
+  document.getElementById('topProdChart').innerHTML = topProds.length
+    ? topProds.map(([id, cnt]) => {
+        const p = DB.products().find(p => p.id == id);
+        return p ? `<div class="cat-bar-row">
+          <span class="cat-bar-lbl" style="width:130px;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.ico} ${p.name}</span>
+          <div class="cat-bar-track"><div class="cat-bar-fill" style="width:${Math.round(cnt / mxP * 100)}%"></div></div>
+          <span class="cat-bar-val">${cnt}</span>
+        </div>` : '';
+      }).join('')
+    : '<div style="color:var(--mu);font-size:13px;padding:10px">ডেটা নেই</div>';
+}
+
+// ════════════════════════════════════════════════════════
+//  SETTINGS
+// ════════════════════════════════════════════════════════
+function renderSettings() {
+  const c = DB.cfg();
+  document.getElementById('sBkash').value = c.bkash || '';
+  document.getElementById('sNagad').value = c.nagad || '';
+  document.getElementById('sWa').value = c.whatsapp || '';
+  document.getElementById('sEmail').value = c.contactEmail || '';
+  document.getElementById('sAdminEmail').value = c.adminEmail || '';
+  document.getElementById('sSiteName').value = c.siteName || '';
+
+  // System info
+  const orders = DB.orders();
+  const users = DB.users();
+  const prods = DB.products();
+  const total = orders.filter(o => o.status !== 'rejected').reduce((s, o) => s + Number(o.price), 0);
+  document.getElementById('sysGrid').innerHTML = [
+    ['📦', orders.length, 'মোট অর্ডার'],
+    ['💰', '৳' + total.toLocaleString(), 'মোট আয়'],
+    ['👤', users.length, 'মোট ইউজার'],
+    ['🛍️', prods.filter(p => p.status === 'active').length, 'সক্রিয় প্রোডাক্ট'],
+    ['⏳', orders.filter(o => o.status === 'pending').length, 'পেন্ডিং'],
+  ].map(([i, v, l]) => `<div class="sys-c"><div style="font-size:22px">${i}</div><div class="sys-val">${v}</div><div class="sys-lbl">${l}</div></div>`).join('');
+}
+
+function saveCfg(type) {
+  const c = DB.cfg();
+  if (type === 'payment') {
+    c.bkash = document.getElementById('sBkash').value.trim() || c.bkash;
+    c.nagad = document.getElementById('sNagad').value.trim() || c.nagad;
+    c.whatsapp = document.getElementById('sWa').value.trim() || c.whatsapp;
+    c.contactEmail = document.getElementById('sEmail').value.trim() || c.contactEmail;
+  }
+  if (type === 'site') {
+    c.siteName = document.getElementById('sSiteName').value.trim() || c.siteName;
+  }
+  DB.saveCfg(c);
+  DB.addLog('admin_login', `সেটিংস আপডেট করা হয়েছে (${type})`);
+  toast('✅', 'সেটিংস সেভ হয়েছে! সাইটে আপডেট হবে।');
+}
+
+function changePass() {
+  const newEmail = document.getElementById('sAdminEmail').value.trim();
+  const np = document.getElementById('sNewPass').value;
+  const cp = document.getElementById('sConfPass').value;
+  if (np && np.length < 6) { toast('❌', 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষর!'); return }
+  if (np && np !== cp) { toast('❌', 'পাসওয়ার্ড মিলছে না!'); return }
+  const c = DB.cfg();
+  if (newEmail) c.adminEmail = newEmail;
+  if (np) c.adminPass = np;
+  DB.saveCfg(c);
+  DB.addLog('admin_login', 'Admin ক্রেডেনশিয়াল পরিবর্তন করা হয়েছে');
+  document.getElementById('sNewPass').value = '';
+  document.getElementById('sConfPass').value = '';
+  toast('🔒', 'ক্রেডেনশিয়াল পরিবর্তন হয়েছে!');
+}
+
+function clearDelivered() {
+  if (!confirm('সব ডেলিভারড অর্ডার মুছবেন?')) return;
+  DB.saveOrders(DB.orders().filter(o => o.status !== 'delivered'));
+  toast('🧹', 'ডেলিভারড অর্ডার মুছে গেছে।');
+  renderDashboard();
+}
+
+function nukeOrders() {
+  if (!confirm('সব অর্ডার মুছবেন? এটি পূর্বাবস্থায় ফেরানো যাবে না!')) return;
+  if (!confirm('আপনি কি সত্যিই নিশ্চিত?')) return;
+  DB.saveOrders([]);
+  toast('⚠️', 'সব অর্ডার মুছে গেছে।');
+  renderDashboard();
+}
+
+// ════════════════════════════════════════════════════════
+//  LOGS
+// ════════════════════════════════════════════════════════
+function renderLogs() {
+  let logs = DB.logs();
+  const q = (document.getElementById('logQ')?.value || '').toLowerCase();
+  const t = document.getElementById('logT')?.value || 'all';
+  if (q) logs = logs.filter(l => l.msg.toLowerCase().includes(q));
+  if (t !== 'all') logs = logs.filter(l => l.type === t);
+
+  const typeClass = { order_placed: 'lt-order', admin_login: 'lt-admin', user_login: 'lt-user', user_register: 'lt-user', payment: 'lt-payment', product: 'lt-product', coupon: 'lt-coupon' };
+  const typeLabel = { order_placed: 'অর্ডার', admin_login: 'অ্যাডমিন', user_login: 'লগইন', user_register: 'নিবন্ধন', payment: 'পেমেন্ট', product: 'প্রোডাক্ট', coupon: 'কুপন' };
+
+  document.getElementById('logList').innerHTML = logs.length
+    ? logs.map(l => `
+      <div class="log-item">
+        <span class="log-type ${typeClass[l.type] || 'lt-order'}">${typeLabel[l.type] || l.type}</span>
+        <span class="log-msg">${l.msg}</span>
+        <span class="log-time">${l.time}</span>
+      </div>`).join('')
+    : '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">কোনো লগ নেই</div>';
+}
+
+function nukeLogs() {
+  if (!confirm('সব লগ মুছবেন?')) return;
+  DB.s('premiumLogs', []);
+  renderLogs();
+  toast('🗑️', 'লগ মুছে গেছে।');
+}
+
+// ════════════════════════════════════════════════════════
+//  NOTIFICATIONS
+// ════════════════════════════════════════════════════════
+function pushNotif(msg) {
+  const notifs = DB.notifs();
+  notifs.unshift({ msg, time: new Date().toLocaleString('bn-BD'), read: false, ts: Date.now() });
+  if (notifs.length > 50) notifs.splice(50);
+  DB.saveNotifs(notifs);
+  document.getElementById('ndot').style.display = '';
+}
+
+function toggleNotif() {
+  const panel = document.getElementById('notifPanel');
+  panel.classList.toggle('on');
+  if (panel.classList.contains('on')) renderNotifList();
+}
+
+function renderNotifList() {
+  const notifs = DB.notifs();
+  document.getElementById('notifList').innerHTML = notifs.length
+    ? notifs.map(n => `<div class="notif-item ${n.read ? '' : 'unread'}"><div class="notif-msg">${n.msg}</div><div class="notif-time">${n.time}</div></div>`).join('')
+    : '<div style="padding:24px;text-align:center;color:var(--mu);font-size:13px">কোনো নোটিফিকেশন নেই</div>';
+}
+
+function clearNotifs() {
+  const notifs = DB.notifs().map(n => ({ ...n, read: true }));
+  DB.saveNotifs(notifs);
+  document.getElementById('ndot').style.display = 'none';
+  renderNotifList();
+}
+
+// ════════════════════════════════════════════════════════
+//  EXPORT CSV
+// ════════════════════════════════════════════════════════
+function exportCSV(type) {
+  let rows, headers, filename;
+  if (type === 'orders') {
+    const orders = DB.orders();
+    if (!orders.length) { toast('ℹ️', 'কোনো অর্ডার নেই!'); return }
+    headers = ['ID', 'তারিখ', 'নাম', 'ইমেইল', 'প্রোডাক্ট', 'পেমেন্ট', 'TRX ID', 'পরিমাণ', 'স্ট্যাটাস', 'কুপন'];
+    rows = orders.map(o => [o.id, o.date, o.name, o.email, o.productName, o.payment, o.trx, o.price, o.status, o.coupon || '']);
+    filename = 'premium-orders';
+  } else {
+    const users = DB.users();
+    if (!users.length) { toast('ℹ️', 'কোনো ইউজার নেই!'); return }
+    headers = ['ID', 'নাম', 'ইমেইল', 'নিবন্ধন', 'স্ট্যাটাস'];
+    rows = users.map(u => [u.id, u.name, u.email, u.joinDate, u.banned ? 'নিষিদ্ধ' : 'সক্রিয়']);
+    filename = 'premium-users';
+  }
+  const csv = [headers, ...rows].map(r => r.map(c => `"${String(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = `${filename}-${new Date().toLocaleDateString('en-CA')}.csv`;
+  a.click();
+  toast('📥', 'CSV ডাউনলোড হচ্ছে...');
+}
+
+// ════════════════════════════════════════════════════════
+//  HELPERS
+// ════════════════════════════════════════════════════════
+function stLbl(s) { return { pending: 'পেন্ডিং', approved: 'অনুমোদিত', delivered: 'ডেলিভারড', rejected: 'প্রত্যাখ্যাত' }[s] || s; }
+
+function updateBadges() {
+  const pending = DB.orders().filter(o => o.status === 'pending').length;
+  const pb = document.getElementById('pBadge'); pb.textContent = pending; pb.style.display = pending ? '' : 'none';
+  const ppb = document.getElementById('ppBadge'); ppb.textContent = pending; ppb.style.display = pending ? '' : 'none';
+}
+
+function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+
+// Close modals on bg click
+document.querySelectorAll('.overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('on'); });
+});
+
+// Close notif on outside click
+document.addEventListener('click', e => {
+  if (!e.target.closest('#notifPanel') && !e.target.closest('.tb-notif-btn')) {
+    document.getElementById('notifPanel').classList.remove('on');
+  }
+});
+
+// ════════════════════════════════════════════════════════
+//  TOAST
+// ════════════════════════════════════════════════════════
+function toast(ico, msg, dur = 4000) {
+  document.getElementById('tIco').textContent = ico;
+  document.getElementById('tMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(t._t);
+  t._t = setTimeout(() => t.classList.remove('show'), dur);
+}
+
+// ════════════════════════════════════════════════════════
+//  INIT
+// ════════════════════════════════════════════════════════
+function initApp() {
+  // topbar date
+  const updateDate = () => {
+    document.getElementById('tbDate').textContent = new Date().toLocaleDateString('bn-BD', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' });
+  };
+  updateDate();
+  setInterval(updateDate, 60000);
+
+  // Check pending orders, show notif dot
+  const pending = DB.orders().filter(o => o.status === 'pending').length;
+  if (pending) document.getElementById('ndot').style.display = '';
+
+  renderDashboard();
+
+  // Check if already logged in via session
+}
+
+// Auto-login if session exists
+window.addEventListener('DOMContentLoaded', () => {
+  const sess = DB.g('premiumSession');
+  if (sess?.email) {
+    const cfg = DB.cfg();
+    if (sess.email === cfg.adminEmail) {
+      document.getElementById('loginWrap').style.display = 'none';
+      document.getElementById('appWrap').style.display = 'flex';
+      initApp();
+    }
+  }
+  document.getElementById('lEmail').focus();
+});
+</script>
+</body>
+</html>
